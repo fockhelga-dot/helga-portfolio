@@ -1,2 +1,2 @@
-# helga-portfolio
+# portfolio
 Helga Mezey-Fock motion designer portfolio
