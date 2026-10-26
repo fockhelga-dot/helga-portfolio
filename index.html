@@ -880,8 +880,11 @@ body.inwork .nav{padding:.7rem 5vw;background:color-mix(in srgb,var(--bg) 82%,tr
     var rep=co.preview;
     if(!rep){ var cats=co.categories||[]; for(var i=0;i<cats.length;i++){ if(cats[i].projects && cats[i].projects.length){ rep=cats[i].projects[0]; break; } } }
     if(!rep) rep={variant:1};
+    var hov=ytId((CO_HOVER[coSlug(co)]||"").trim());
+    var yt=hov||rep.yt;
     var cust=(CO_THUMBS[coSlug(co)]||"").trim();
-    if(cust) return { title:co.name, thumb:cust, yt:rep.yt, variant:rep.variant||1 };
+    if(cust) return { title:co.name, thumb:cust, yt:yt, variant:rep.variant||1 };
+    if(hov) return { title:rep.title, thumb:rep.thumb, yt:yt, variant:rep.variant||1 };
     return rep;
   }
   /* ============================================================ YOUTUBE LINKS
@@ -892,7 +895,7 @@ body.inwork .nav{padding:.7rem 5vw;background:color-mix(in srgb,var(--bg) 82%,tr
   ============================================================ */
   var YT = {
     "showreel": "https://youtu.be/KyIBRLysuL8",
-    "flipsnack-long-1": "https://www.youtube.com/watch?v=ijl70Zj4pQ4", "flipsnack-long-2": "https://youtu.be/vBqlhQFjOzw", "flipsnack-long-3": "https://youtu.be/h8tlaPZh90I", "flipsnack-long-4": "https://youtu.be/0AAhNdGCwAc", "flipsnack-long-5": "https://youtu.be/2YzTbGuV5jk",
+    "flipsnack-long-1": "https://youtu.be/pIZn8glPMNw", "flipsnack-long-2": "https://youtu.be/vBqlhQFjOzw", "flipsnack-long-3": "https://youtu.be/h8tlaPZh90I", "flipsnack-long-4": "https://youtu.be/0AAhNdGCwAc", "flipsnack-long-5": "https://youtu.be/2YzTbGuV5jk",
     "flipsnack-long-6": "https://youtu.be/DALBr-HN5n4",
     "flipsnack-ad-1": "https://youtu.be/5ViW1cfFWWQ", "flipsnack-ad-2": "https://youtu.be/IfuHkSLOSPk", "flipsnack-ad-3": "https://youtu.be/9beARX7oDxk", "flipsnack-ad-4": "https://youtu.be/Sncn5LvzqLk", "flipsnack-ad-5": "https://youtu.be/7pw-kmKyNMI",
     "flipsnack-social-1": "https://youtube.com/shorts/HDrSBbJzQXo?feature=share", "flipsnack-social-2": "https://youtube.com/shorts/pAQoaSwXyxU?feature=share", "flipsnack-social-3": "https://youtube.com/shorts/qukWN73jBfM?feature=share", "flipsnack-social-4": "https://youtube.com/shorts/YscdancYe-k?feature=share",
@@ -934,6 +937,17 @@ body.inwork .nav{padding:.7rem 5vw;background:color-mix(in srgb,var(--bg) 82%,tr
     "catalogy":  "media/catalogy.jpg",
     "imago":     "media/imago.jpg",
     "personal":  "media/personal.jpg"
+  };
+  /* ============================================================ COMPANY HOVER VIDEO
+     ▼▼▼  WHICH VIDEO PLAYS ON HOVER OVER EACH "OTHER WORK" ROW  ▼▼▼
+     Paste a YouTube link/ID per company. Leave "" to use the company's first project.
+     (This changes only the hover video — the cover image stays as set in CO_THUMBS.)
+  ============================================================ */
+  var CO_HOVER = {
+    "flipsnack": "https://youtu.be/vBqlhQFjOzw",
+    "catalogy":  "",
+    "imago":     "",
+    "personal":  ""
   };
   function autoMedia(){
     COMPANIES.forEach(function(co){
@@ -1010,7 +1024,14 @@ body.inwork .nav{padding:.7rem 5vw;background:color-mix(in srgb,var(--bg) 82%,tr
   }
   function readyMedia(el){
     var show=function(){ el.classList.add("ready"); var f=el.parentNode, an=f&&f.querySelector(".anim"); if(an) an.style.display="none"; };
-    if(el.tagName==="IMG"){ if(el.complete && el.naturalWidth>0){ show(); } else { el.addEventListener("load", show); } }
+    if(el.tagName==="IMG"){
+      var swap=function(){ if(el.__alt) return; el.__alt=true; var s=el.getAttribute("src")||"";
+        if(/\.jpe?g$/i.test(s)){ el.src=s.replace(/\.jpe?g$/i,".png"); }
+        else if(/\.png$/i.test(s)){ el.src=s.replace(/\.png$/i,".jpg"); } };
+      el.addEventListener("load", show);
+      el.addEventListener("error", swap);
+      if(el.complete){ if(el.naturalWidth>0){ show(); } else { swap(); } }
+    }
     else { if(el.readyState>=2){ show(); } else { el.addEventListener("loadeddata", show); } }
   }
   function bindMedia(){
